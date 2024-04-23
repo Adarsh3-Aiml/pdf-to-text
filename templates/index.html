@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Extraction and NER System</title>
+</head>
+<body>
+    <h1>Document Extraction and NER System</h1>
+    
+    <h2>Upload Document</h2>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" id="file-input">
+        <button type="submit" id="upload-btn">Upload</button>
+    </form>
+    
+    <div id="results">
+        <h2>Extracted Text</h2>
+        <pre id="extracted-text"></pre>
+        
+        <h2>Categorized Entities</h2>
+        <ul id="entities-list"></ul>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var form_data = new FormData(this);
+            fetch('/upload', {
+                method: 'POST',
+                body: form_data
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('extracted-text').innerText = data.text;
+                var entities_list = document.getElementById('entities-list');
+                entities_list.innerHTML = '';
+                data.entities.forEach(function(entity) {
+                    var li = document.createElement('li');
+                    li.innerText = entity[0] + ' (' + entity[1] + ')';
+                    entities_list.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
